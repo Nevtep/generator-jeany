@@ -1,0 +1,27 @@
+import React from 'react';
+import { View, StyleSheet } from 'react-native';
+import <%= componentName %> from '<% if (type !== 'Blank') {%>../<%}%>../components/<%= componentName %>';
+
+export default function <%= componentName %>Screen({ navigation }: any) {
+  <% if(type == 'Form') { %>
+    const backToList = () => {
+        navigation.goBack()
+    } 
+  <%}%>
+  <% if(type == 'List') { %>
+    const navigateToForm = () => {
+      navigation.navigate('Form')
+    } 
+  <%}%>
+    return (
+      <View style={styles.container}>
+        <<%= componentName %><% if(type == 'Form') { %> navigateTo<%= entityName %>List={backToList}<%}%><% if(type == 'List') { %> navigateTo<%= entityName %>Form={navigateToForm}<%}%> />
+      </View>
+    );
+  }
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1
+    },
+  });

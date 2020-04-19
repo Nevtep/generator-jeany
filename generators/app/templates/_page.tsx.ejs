@@ -1,0 +1,18 @@
+import React from 'react';
+import { navigate } from 'gatsby';
+import <%=componentName%> from '<% if (type !== 'Blank') {%>../<%}%>../components/<%=componentName%>';
+<% if(type == 'Form') { %>
+    const backToList = () => {
+        navigate('/<%= entityName.toLowerCase() %>s/list')
+    }
+  <%}%>
+  <% if(type == 'List') { %>
+    const navigateToForm = () => {
+        navigate('/<%= entityName.toLowerCase() %>s/form')
+    }
+  <%}%>
+const <%=componentName%>Page = () => (
+    <<%=componentName%><% if(type == 'Form') { %> navigateTo<%= entityName %>List={backToList}<%}%><% if(type == 'List') { %> navigateTo<%= entityName %>Form={navigateToForm}<%}%> />
+)
+
+export default <%=componentName%>Page;

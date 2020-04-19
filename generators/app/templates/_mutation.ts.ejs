@@ -1,0 +1,13 @@
+import gql from 'graphql-tag';
+
+export const <%= mutationName %> = gql`
+mutation <%= mutationName.split('_').map(part => part.substr(0,1) + part.substr(1).toLowerCase()).join('') %>($<%= entityName.toLowerCase()%>: <%= entityName%>Input!) {
+    <%= mutationName.split('_').map((part, index) => index == 0 ? part.toLowerCase() : part.substr(0,1) + part.substr(1).toLowerCase()).join('') %>(<%= entityName.toLowerCase()%>: $<%= entityName.toLowerCase()%>) {
+    <%= entityName.toLowerCase()%> {
+        <% for (property of props) {%>
+          <%= property.name %>
+        <% } %>
+    }
+  }
+}
+`;

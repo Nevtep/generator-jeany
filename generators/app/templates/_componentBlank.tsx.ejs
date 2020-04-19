@@ -1,0 +1,21 @@
+import * as React from 'react';
+import { StyleSheet } from 'react-native';
+<%if(addQuery || addMutation){%>
+import {<%= addQuery ? ' useQuery,' : '' %><%= addMutation ? ' useMutation' : '' %>  } from '@apollo/react-hooks';
+import {<%= addQuery ? ` ${queryName},` : '' %><%= addMutation ? ` ${mutationName}` : '' %> } from '../queries';<%}%>
+
+export interface <%= componentName %>Props {
+}
+
+const <%= componentName %>: React.FC<<%= componentName %>Props> = () => {
+    <%if(addQuery){%>const { loading, error, data } = useQuery(<%= queryName %>);<%}%>
+    <%if(addMutation){%>const [mutate<%= mutationName.split('_').map(part => part.substr(0,1) + part.substr(1).toLowerCase()).join('') %>, { loading, error, data }] = useMutation(<%= mutationName %>);<%}%>
+    return (<React.Fragment>
+      
+    </React.Fragment>);
+}
+
+const styles = StyleSheet.create({
+})
+
+export default <%= componentName %>;

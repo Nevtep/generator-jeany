@@ -1,0 +1,9 @@
+{
+  "generator-oasis": {},
+  "generator-node": {
+    "promptValues": {
+      "authorEmail": "corellanot@gmail.com",
+      "authorUrl": ""
+    }
+  }
+}

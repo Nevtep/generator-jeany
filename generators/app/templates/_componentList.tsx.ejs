@@ -1,0 +1,56 @@
+import * as React from 'react';
+import { StyleSheet, useWindowDimensions } from 'react-native';
+import { useQuery } from '@apollo/react-hooks';
+import { DataTable, FAB } from 'react-native-paper';
+import <%= entityName %>Row from './<%= entityName %>Row';
+import { <%= queryName %> } from '../queries';
+import { <%= queryName.split('_').map(part => part.substr(0,1) + part.substr(1).toLowerCase()).join('') %> } from '../queries/__generated__/<%= queryName.split('_').map(part => part.substr(0,1) + part.substr(1).toLowerCase()).join('') %>';
+
+export interface <%= entityName %>ListProps {
+  navigateTo<%= entityName %>Form: () => void;
+}
+
+const <%= entityName %>List: React.FC<<%= entityName %>ListProps> = ({ navigateTo<%= entityName %>Form }) => {
+    const { loading, error, data } = useQuery<<%= queryName.split('_').map(part => part.substr(0,1) + part.substr(1).toLowerCase()).join('') %>>(<%= queryName %>);
+    const { width } = useWindowDimensions();
+    const { <%= entityName.toLowerCase() %>s } = data || {};
+    return (<React.Fragment>
+      <DataTable>
+        <DataTable.Header>
+        <% for (property of props) { %>
+          <DataTable.Title><%= property.title %></DataTable.Title>
+        <% } %>
+        </DataTable.Header>
+
+        {<%= entityName.toLowerCase() %>s?.map((<%= entityName.toLowerCase() %>, index) => (
+            <<%= entityName %>Row key={index} {...<%= entityName.toLowerCase() %>} />
+        ))}
+
+        {/* <DataTable.Pagination
+          page={1}
+          numberOfPages={3}
+          onPageChange={(page) => { console.log(page); }}
+          label="1-2 of 6"
+        /> */}
+      </DataTable>
+      <FAB
+        style={[styles.fab, width < 600 ? styles.fabMobile : null]}
+        small
+        icon="plus"
+        onPress={navigateTo<%= entityName %>Form}
+      />
+    </React.Fragment>);
+}
+
+const styles = StyleSheet.create({
+  fab: {
+    position: 'absolute',
+    margin: 16,
+    right: 0,
+  },
+  fabMobile: {
+    bottom: 0,
+  }
+})
+
+export default <%= entityName %>List;

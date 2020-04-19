@@ -1,0 +1,36 @@
+import React from 'react';
+import { createStackNavigator } from '@react-navigation/stack';
+
+import <%= entityName %>ListScreen from './ListScreen';
+import <%= entityName %>FormScreen from './FormScreen';
+import NavMenu from '../../components/NavMenu';
+
+const Stack = createStackNavigator();
+
+export const <%= entityName %>Stack = ({ navigation }: any ) => {
+  const handleToggleDrawer = () => {
+    navigation.toggleDrawer();
+  }
+  return (
+    <Stack.Navigator
+        initialRouteName="List"
+        headerMode="screen"
+        screenOptions={{
+            header: ({ scene, previous, navigation }) => (
+                <NavMenu handleDrawerMenu={handleToggleDrawer}/>
+            ),
+        }}
+    >
+      <Stack.Screen
+        name="List"
+        component={<%= entityName %>ListScreen}
+        options={{ headerTitle: 'List' }}
+      />
+      <Stack.Screen
+        name="Form"
+        component={<%= entityName %>FormScreen}
+        options={{ headerTitle: 'Edit' }}
+      />
+    </Stack.Navigator>
+  );
+};

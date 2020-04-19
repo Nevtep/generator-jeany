@@ -1,0 +1,78 @@
+import React, { useState } from 'react';
+import { useMutation } from '@apollo/react-hooks';
+import { View, StyleSheet } from 'react-native';
+import { theme } from '../theme';
+
+import { Input } from './system/Input';
+import { Button } from './system/Button';
+import { <%= queryName %> } from '../queries';
+import { <%= mutationName %> } from '../mutations';
+import { <%= queryName.split('_').map(part => part.substr(0,1) + part.substr(1).toLowerCase()).join('') %> } from '../queries/__generated__/<%= queryName.split('_').map(part => part.substr(0,1) + part.substr(1).toLowerCase()).join('') %>';
+import { <%= mutationName.split('_').map(part => part.substr(0,1) + part.substr(1).toLowerCase()).join('') %> } from '../mutations/__generated__/<%= mutationName.split('_').map(part => part.substr(0,1) + part.substr(1).toLowerCase()).join('') %>';
+
+export interface <%= entityName %>FormProps {
+    navigateTo<%= entityName %>List: () => void;
+}
+const <%= entityName %>Form: React.FC<<%= entityName %>FormProps> = ({ navigateTo<%= entityName %>List }) => {
+  const [mutate<%= mutationName.split('_').map(part => part.substr(0,1) + part.substr(1).toLowerCase()).join('') %>, { loading }] = useMutation<<%= mutationName.split('_').map(part => part.substr(0,1) + part.substr(1).toLowerCase()).join('') %>>(
+    <%= mutationName %>,
+    {
+      update(cache, { data }) {
+        const { <%= mutationName.split('_').map((part, index) => index == 0 ? part.toLowerCase() : part.substr(0,1) + part.substr(1).toLowerCase()).join('') %> } = data || {};
+        const { <%= entityName.toLowerCase() %> } = <%= mutationName.split('_').map((part, index) => index == 0 ? part.toLowerCase() : part.substr(0,1) + part.substr(1).toLowerCase()).join('') %> || {};
+        const oldData = cache.readQuery<<%= queryName.split('_').map(part => part.substr(0,1) + part.substr(1).toLowerCase()).join('') %>>({ query: <%= queryName %> });
+        const { <%= entityName.toLowerCase() %>s } = oldData || {};
+        const newData = <%= entityName.toLowerCase() %> ? [<%= entityName.toLowerCase() %>] : [];
+        cache.writeQuery({
+          query: <%= queryName %>,
+          data: { field: <%= entityName.toLowerCase() %>s?.concat(newData) },
+        });
+      }
+    }
+  );
+  <% for (property of props) { %>
+  const [ <%= property.name %>, set<%= property.name.substr(0,1).toUpperCase() + property.name.substr(1) %> ] = useState(<%= property.isNumeric ? 0 : '' %>);
+  <% } %>
+
+  return (
+    <View style={styles.container}>
+        <% for (property of props) { %><Input
+            style={styles.input}
+            placeholder='<%= property.title %>'
+            label='<%= property.title %>'
+            value={<% if (property.isNumeric) {%><%= property.name %>.toString()<%} else {%><%= property.name %><% } %>}
+            onChangeText={(value) => {set<%= property.name.substr(0,1).toUpperCase() + property.name.substr(1) %>(<% if (property.isNumeric) {%>parseInt(value)<%} else {%>value<% } %>)}}
+            disabled={loading}
+        /><% } %>
+        <View style={styles.row}>
+            <Button style={styles.button} mode="contained" color={theme.colors.primary} loading={loading} onPress={() => {
+                mutate<%= mutationName.split('_').map(part => part.substr(0,1) + part.substr(1).toLowerCase()).join('') %>({ variables: { <%= entityName.toLowerCase() %>: { <%= props.map(prop => prop.name).join(', ') %> } } })
+                    .then(navigateTo<%= entityName %>List);
+            }}>
+                Crear <%= entityName %>
+            </Button>
+            <Button style={styles.button} mode="contained" color={theme.colors.accent} disabled={loading} onPress={navigateTo<%= entityName %>List}>Cancelar</Button>
+        </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+    },
+    row: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        flexDirection: 'row',
+    },
+    input: {
+        marginVertical: 8,
+        marginHorizontal: 16,
+    },
+    button: {
+      margin: 4,
+    }
+})
+
+export default <%= entityName %>Form;
