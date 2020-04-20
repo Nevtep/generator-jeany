@@ -5,17 +5,14 @@ import { <%= queryName.split('_').map(part => part.substr(0,1) + part.substr(1).
 export interface <%= entityName %>RowProps extends Partial<<%= queryName.split('_').map(part => part.substr(0,1) + part.substr(1).toLowerCase()).join('') %>_<%= entityName.toLowerCase()%>s> {
 }
 
-export default class <%= entityName %>Row extends React.Component<<%= entityName %>RowProps> {
-  render() {
+const <%= entityName %>Row: React.FC<<%= entityName %>RowProps> = ({navigateTo<%= entityName %>Form, children, ...<%= entityName.toLowerCase() %>}) => {
+    const { <% for (property of props) { %><%= property.name%>, <%}%>} = <%= entityName.toLowerCase() %>;
 
     return (
-
         <DataTable.Row>
-            <% for (property of props) { %>
-                <DataTable.Cell<%= property.isNumeric ? ' numeric' : ''%>>{this.props.<%= property.name %>}</DataTable.Cell>
-            <% } %>
+            <% for (property of props) { %><DataTable.Cell<%= property.isNumeric ? ' numeric' : ''%>>{<%= property.name %>}</DataTable.Cell><% } %>
         </DataTable.Row>
-
     );
-  }
 }
+
+export default <%= entityName %>Row;

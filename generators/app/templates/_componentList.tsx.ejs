@@ -7,7 +7,7 @@ import { <%= queryName %> } from '../queries';
 import { <%= queryName.split('_').map(part => part.substr(0,1) + part.substr(1).toLowerCase()).join('') %> } from '../queries/__generated__/<%= queryName.split('_').map(part => part.substr(0,1) + part.substr(1).toLowerCase()).join('') %>';
 
 export interface <%= entityName %>ListProps {
-  navigateTo<%= entityName %>Form: () => void;
+  navigateTo<%= entityName %>Form: (<%= entityName.toLowerString() %>?: <%= queryName.split('_').map(part => part.substr(0,1) + part.substr(1).toLowerCase()).join('') %>_<%= entityName.toLowerCase() %>s) => void;
 }
 
 const <%= entityName %>List: React.FC<<%= entityName %>ListProps> = ({ navigateTo<%= entityName %>Form }) => {
@@ -23,7 +23,7 @@ const <%= entityName %>List: React.FC<<%= entityName %>ListProps> = ({ navigateT
         </DataTable.Header>
 
         {<%= entityName.toLowerCase() %>s?.map((<%= entityName.toLowerCase() %>, index) => (
-            <<%= entityName %>Row key={index} {...<%= entityName.toLowerCase() %>} />
+            <<%= entityName %>Row key={index} {...<%= entityName.toLowerCase() %>} navigateTo<%= entityName %>Form={navigateTo<%= entityName %>Form} />
         ))}
 
         {/* <DataTable.Pagination
@@ -37,7 +37,7 @@ const <%= entityName %>List: React.FC<<%= entityName %>ListProps> = ({ navigateT
         style={[styles.fab, width < 600 ? styles.fabMobile : null]}
         small
         icon="plus"
-        onPress={navigateTo<%= entityName %>Form}
+        onPress={() => navigateTo<%= entityName %>Form()}
       />
     </React.Fragment>);
 }

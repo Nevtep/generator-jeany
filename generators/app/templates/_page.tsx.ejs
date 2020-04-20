@@ -1,18 +1,24 @@
 import React from 'react';
-import { navigate } from 'gatsby';
+import { navigate, PageProps } from 'gatsby';
 import <%=componentName%> from '<% if (type !== 'Blank') {%>../<%}%>../components/<%=componentName%>';
 <% if(type == 'Form') { %>
-    const backToList = () => {
-        navigate('/<%= entityName.toLowerCase() %>s/list')
-    }
+export interface <%= entityName %>FormLocationState {
+  <%= entityName.toLowerCase() %>?: <%= queryName.split('_').map(part => part.substr(0,1) + part.substr(1).toLowerCase()).join('') %>_<%= entityName.toLowerCase() %>s;
+}
+const backToList = () => {
+    navigate('/<%= entityName.toLowerCase() %>s/list')
+}
   <%}%>
   <% if(type == 'List') { %>
-    const navigateToForm = () => {
-        navigate('/<%= entityName.toLowerCase() %>s/form')
+    const navigateToForm = (<%= entityName.toLowerCase() %>?: <%= queryName.split('_').map(part => part.substr(0,1) + part.substr(1).toLowerCase()).join('') %>_<%= entityName.toLowerCase() %>s) => {
+        navigate('/<%= entityName.toLowerCase() %>s/form', {
+          state: { <%= entityName.toLowerCase() %> },
+      })
     }
   <%}%>
-const <%=componentName%>Page = () => (
-    <<%=componentName%><% if(type == 'Form') { %> navigateTo<%= entityName %>List={backToList}<%}%><% if(type == 'List') { %> navigateTo<%= entityName %>Form={navigateToForm}<%}%> />
+const <%=componentName%>Page: React.FC<PageProps> = ({ location }) => (
+  <% if(type == 'Form') { %>const { <%= entityName.toLowerCase() %> } = location?.state as <%= entityName %>FormLocationState; <% } %>
+    <<%=componentName%><% if(type == 'Form') { %> navigateTo<%= entityName %>List={backToList} <%= entityName.toLowerCase() %>={<%= entityName.toLowerCase() %>}<%}%><% if(type == 'List') { %> navigateTo<%= entityName %>Form={navigateToForm}<%}%> />
 )
 
 export default <%=componentName%>Page;

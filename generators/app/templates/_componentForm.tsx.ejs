@@ -12,26 +12,28 @@ import { <%= mutationName.split('_').map(part => part.substr(0,1) + part.substr(
 
 export interface <%= entityName %>FormProps {
     navigateTo<%= entityName %>List: () => void;
+    <%= entityName.toLowerCase() %>: <%= queryName.split('_').map(part => part.substr(0,1) + part.substr(1).toLowerCase()).join('') %>_<%= entityName.toLowerCase() %>s;
 }
-const <%= entityName %>Form: React.FC<<%= entityName %>FormProps> = ({ navigateTo<%= entityName %>List }) => {
+const <%= entityName %>Form: React.FC<<%= entityName %>FormProps> = ({ navigateTo<%= entityName %>List, <%= entityName.toLowerCase() %> }) => {
   const [mutate<%= mutationName.split('_').map(part => part.substr(0,1) + part.substr(1).toLowerCase()).join('') %>, { loading }] = useMutation<<%= mutationName.split('_').map(part => part.substr(0,1) + part.substr(1).toLowerCase()).join('') %>>(
     <%= mutationName %>,
     {
       update(cache, { data }) {
+        if(<%= entityName.toLowerCase() %>) return;
         const { <%= mutationName.split('_').map((part, index) => index == 0 ? part.toLowerCase() : part.substr(0,1) + part.substr(1).toLowerCase()).join('') %> } = data || {};
-        const { <%= entityName.toLowerCase() %> } = <%= mutationName.split('_').map((part, index) => index == 0 ? part.toLowerCase() : part.substr(0,1) + part.substr(1).toLowerCase()).join('') %> || {};
+        const { <%= entityName.toLowerCase() %>: update<%= entityName %> } = <%= mutationName.split('_').map((part, index) => index == 0 ? part.toLowerCase() : part.substr(0,1) + part.substr(1).toLowerCase()).join('') %> || {};
         const oldData = cache.readQuery<<%= queryName.split('_').map(part => part.substr(0,1) + part.substr(1).toLowerCase()).join('') %>>({ query: <%= queryName %> });
         const { <%= entityName.toLowerCase() %>s } = oldData || {};
-        const newData = <%= entityName.toLowerCase() %> ? [<%= entityName.toLowerCase() %>] : [];
+        const newData = update<%= entityName %> ? [update<%= entityName %>] : [];
         cache.writeQuery({
           query: <%= queryName %>,
-          data: { field: <%= entityName.toLowerCase() %>s?.concat(newData) },
+          data: { <%= entityName.toLowerCase() %>s: <%= entityName.toLowerCase() %>s?.concat(newData) },
         });
       }
     }
   );
   <% for (property of props) { %>
-  const [ <%= property.name %>, set<%= property.name.substr(0,1).toUpperCase() + property.name.substr(1) %> ] = useState(<%= property.isNumeric ? 0 : '' %>);
+  const [ <%= property.name %>, set<%= property.name.substr(0,1).toUpperCase() + property.name.substr(1) %> ] = useState(<%= entityName.toLowerCase() %>?.<%= property.name %><%= property.isNumeric ? '.toString()' : '' %> || '');
   <% } %>
 
   return (
@@ -49,7 +51,7 @@ const <%= entityName %>Form: React.FC<<%= entityName %>FormProps> = ({ navigateT
                 mutate<%= mutationName.split('_').map(part => part.substr(0,1) + part.substr(1).toLowerCase()).join('') %>({ variables: { <%= entityName.toLowerCase() %>: { <%= props.map(prop => prop.name).join(', ') %> } } })
                     .then(navigateTo<%= entityName %>List);
             }}>
-                Crear <%= entityName %>
+              {`${<%= entityName.toLowerCase() %> ? 'Modificar' : 'Crear'}`} <%= entityName %>
             </Button>
             <Button style={styles.button} mode="contained" color={theme.colors.accent} disabled={loading} onPress={navigateTo<%= entityName %>List}>Cancelar</Button>
         </View>

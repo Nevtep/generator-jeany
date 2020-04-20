@@ -2,20 +2,20 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import <%= componentName %> from '<% if (type !== 'Blank') {%>../<%}%>../components/<%= componentName %>';
 
-export default function <%= componentName %>Screen({ navigation }: any) {
+const <%= componentName %>Screen = ({ navigation, route }: any) => {
   <% if(type == 'Form') { %>
     const backToList = () => {
         navigation.goBack()
     } 
   <%}%>
   <% if(type == 'List') { %>
-    const navigateToForm = () => {
-      navigation.navigate('Form')
+    const navigateToForm = (<%= entityName.toLowerCase() %>?: <%= queryName.split('_').map(part => part.substr(0,1) + part.substr(1).toLowerCase()).join('') %>_<%= entityName.toLowerCase() %>s) => {
+      navigation.navigate('Form', { <%= entityName.toLowerCase() %> })
     } 
   <%}%>
     return (
       <View style={styles.container}>
-        <<%= componentName %><% if(type == 'Form') { %> navigateTo<%= entityName %>List={backToList}<%}%><% if(type == 'List') { %> navigateTo<%= entityName %>Form={navigateToForm}<%}%> />
+        <<%= componentName %><% if(type == 'Form') { %> navigateTo<%= entityName %>List={backToList} <%= entityName.toLowerCase() %>={<%= entityName.toLowerCase() %>}<%}%><% if(type == 'List') { %> navigateTo<%= entityName %>Form={navigateToForm}<%}%> />
       </View>
     );
   }
@@ -25,3 +25,5 @@ export default function <%= componentName %>Screen({ navigation }: any) {
       flex: 1
     },
   });
+
+  export default <%= componentName %>Screen;
