@@ -10,9 +10,6 @@ module.exports = class extends Generator {
       yosay(`Welcome to the prime ${chalk.cyan('Oasis React Toolkit')} generator!`)
     );
 
-    
-    const props = [];
-
     var propsPromps = [
       {
         type: 'input',
@@ -31,7 +28,7 @@ module.exports = class extends Generator {
         type: 'confirm',
         name: 'isNumeric',
         message: 'Is a numeric property?',
-        default: true
+        default: false
       },
       {
         type: 'confirm',
@@ -41,12 +38,20 @@ module.exports = class extends Generator {
       }
     ];
 
-    const getProperties = async () => {
+    const promptForProps = async (props) => {
       const {addAnother, ...property} = await this.prompt(propsPromps);
       props.push(property);
       if (addAnother) {
-        await getProperties();
-      } 
+        return await promptForProps(props);
+      } else {
+        debugger;
+        return props;
+      }
+    }
+
+    const getProperties = async () => {
+      const props = [];
+      return await promptForProps(props);
     }
 
     const createQuery = async () => {
@@ -60,6 +65,26 @@ module.exports = class extends Generator {
           message: 'Enter the query name:',
           default: function(answers) {
             return `GET_${answers.entityName.toUpperCase()}S`;
+          },
+        }
+      ]);
+    }
+
+    const createMutation = async () => {
+      return await this.prompt([
+        {
+          name: 'entityName',
+          message: 'Please enter your entity name:'
+        },
+        {
+          name: 'inputEntityName',
+          message: 'Please enter your input entity name:'
+        },
+        {
+          name: 'mutationName',
+          message: 'Enter the mutation name:',
+          default: function(answers) {
+            return `SET_${answers.entityName.toUpperCase()}`;
           },
         }
       ]);
@@ -103,6 +128,16 @@ module.exports = class extends Generator {
             return `CREATE_OR_UPDATE_${answers.entityName.toUpperCase()}`;
           },
         },
+        {
+          name: 'inputEntityName',
+          message: 'Please enter your input entity name:',
+          when: function(answers) {
+            return answers.addForm;
+          },
+          default: function(answers) {
+            return answers.entityName;
+          },
+        },
       ];
 
       return await this.prompt(prompts);
@@ -116,6 +151,15 @@ module.exports = class extends Generator {
           message: 'What kind of component do you want to generate?',
           choices: ['List', 'Form', 'Blank'],
           default: 'List',
+          cache: true,
+        },
+        {
+          name: 'entityName',
+          message: 'Enter a name for your entity:',
+          when: function(answers) {
+            return answers.type != 'Blank'
+          },
+          default: 'Entity',
           cache: true,
         },
         {
@@ -155,21 +199,22 @@ module.exports = class extends Generator {
           cache: true,
         },
         {
+          name: 'inputEntityName',
+          message: 'Please enter your input entity name:',
+          when: function(answers) {
+            return answers.addMutation;
+          },
+          default: function(answers) {
+            return answers.entityName;
+          },
+        },
+        {
           name: 'name',
           message: 'Enter a name for your component:',
           when: function(answers) {
             return answers.type == 'Blank'
           },
           default: 'EntityComponent',
-          cache: true,
-        },
-        {
-          name: 'entityName',
-          message: 'Enter a name for your entity:',
-          when: function(answers) {
-            return answers.type != 'Blank'
-          },
-          default: 'Entity',
           cache: true,
         },
         {
@@ -195,32 +240,80 @@ module.exports = class extends Generator {
       name: 'type',
       type: 'list',
       message: 'What would you like to scaffold?',
-      choices: ['Stack','Component', 'Query'],
+      choices: ['Stack','Component', 'Query', 'Mutation'],
       default: 'Stack',
-    }])
+    }]);
 
     switch(this.generator.type) {
       case 'Stack':
         this.generator.stack = await createStack();
-        await getProperties();
-        this.generator.stack.props = props;
+        this.generator.stack.props = await getProperties();
         break;
       case 'Component':
         this.generator.component = await createComponent();
         if(this.generator.component.type !== 'Blank') {
-          await getProperties();
-          this.generator.component.props = props;
+          this.generator.component.props = await getProperties();
+        } else {
+          const files = await this.prompt([
+            {
+              name: 'createQuery',
+              type: 'confirm',
+              message: 'Do you want to create a query file?',
+              when: function(answers) {
+                return this.generator.component.addQuery;
+              },
+              default: true
+            },{
+              name: 'createMutation',
+              type: 'confirm',
+              message: 'Do you want to create a mutation file?',
+              when: function(answers) {
+                return this.generator.component.addMutation;
+              },
+              default: true
+            },
+          ]);
+          if(files.createQuery || files.createMutation) {
+            const answer = await this.prompt([
+              {
+                name: 'entityName',
+                message: 'Enter the Entity name:'
+              }
+            ]);
+            this.generator.component.entityName = answer.entityName;
+          }
+          if(files.createQuery) {
+            this.generator.component.queryProps = await getProperties();
+          }
+          if(files.createMutation) {
+            this.generator.component.mutationProps = await getProperties();
+          }
+          this.generator.component.createQuery = files.createQuery;
+          this.generator.component.createMutation = files.createMutation;
         }
         break;
       case 'Query':
         this.generator.query = await createQuery();
-        await getProperties();
-        this.generator.query.props = props;
+        this.generator.query.props = await getProperties();
+        break;
+      case 'Mutation':
+        this.generator.mutation = await createMutation();
+        this.generator.mutation.props = await getProperties();
+        break;
     }
 
   }
 
   writing() {
+    debugger;
+    const toCamelCase = (value) => {
+      return value.split('_').map((part, index) => index == 0 ? part.toLowerCase() : part.substr(0,1) + part.substr(1).toLowerCase()).join('');
+    }
+
+    const toPascalCase = (value) => {
+      return value.split('_').map(part => part.substr(0,1) + part.substr(1).toLowerCase()).join('');
+    }
+
     this.destinationRoot('./src');
     
     switch(this.generator.type) {
@@ -325,18 +418,24 @@ module.exports = class extends Generator {
             componentContext
           );
         }
-        if(component.addQuery) {
+        if(component.createQuery) {
           this.fs.copyTpl(
             this.templatePath(`_query.ts.ejs`),
             this.destinationPath(`queries/${component.queryName.split('_').map((part, index) => index == 0 ? part.toLowerCase() : part.substr(0,1) + part.substr(1).toLowerCase()).join('')}.ts`),
-            componentContext
+            {
+              ...componentContext,
+              props: component.queryProps,
+            }
           );
         }
-        if(component.addMutation) {
+        if(component.createMutation) {
           this.fs.copyTpl(
             this.templatePath(`_mutation.ts.ejs`),
             this.destinationPath(`mutations/${component.mutationName.split('_').map((part, index) => index == 0 ? part.toLowerCase() : part.substr(0,1) + part.substr(1).toLowerCase()).join('')}.ts`),
-            componentContext
+            {
+              ...componentContext,
+              props: component.mutationProps,
+            }
           );
         }
         if(component.addPage) {
@@ -362,6 +461,19 @@ module.exports = class extends Generator {
           this.destinationPath(`queries/${query.queryName.split('_').map((part, index) => index == 0 ? part.toLowerCase() : part.substr(0,1) + part.substr(1).toLowerCase()).join('')}.ts`),
           {
             ...query
+          }
+        );
+        break;
+      case 'Mutation':
+        const { mutation } = this.generator;
+        console.log('mutation:', mutation)
+        this.fs.copyTpl(
+          this.templatePath(`_mutation.ts.ejs`),
+          this.destinationPath(`mutation/${mutation.mutationName.split('_').map((part, index) => index == 0 ? part.toLowerCase() : part.substr(0,1) + part.substr(1).toLowerCase()).join('')}.ts`),
+          {
+            ...mutation,
+            toPascalCase,
+            toCamelCase
           }
         );
         break;
