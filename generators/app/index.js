@@ -259,7 +259,7 @@ module.exports = class extends Generator {
               name: 'createQuery',
               type: 'confirm',
               message: 'Do you want to create a query file?',
-              when: function(answers) {
+              when: (answers) => {
                 return this.generator.component.addQuery;
               },
               default: true
@@ -267,7 +267,7 @@ module.exports = class extends Generator {
               name: 'createMutation',
               type: 'confirm',
               message: 'Do you want to create a mutation file?',
-              when: function(answers) {
+              when: (answers) => {
                 return this.generator.component.addMutation;
               },
               default: true
@@ -322,6 +322,8 @@ module.exports = class extends Generator {
         const { entityName } = stack;
         const stackContext = {
           ...stack,
+          toCamelCase,
+          toPascalCase,
         }
         this.fs.copyTpl(
           this.templatePath(`_stack.tsx.ejs`),
@@ -405,6 +407,8 @@ module.exports = class extends Generator {
         const componentContext = {
           ...component,
           componentName: component.type == 'Blank' ? component.name : component.entityName + component.type,
+          toCamelCase,
+          toPascalCase,
         }
         this.fs.copyTpl(
           this.templatePath(`_component${component.type}.tsx.ejs`),
@@ -460,7 +464,9 @@ module.exports = class extends Generator {
           this.templatePath(`_query.ts.ejs`),
           this.destinationPath(`queries/${query.queryName.split('_').map((part, index) => index == 0 ? part.toLowerCase() : part.substr(0,1) + part.substr(1).toLowerCase()).join('')}.ts`),
           {
-            ...query
+            ...query,
+            toCamelCase,
+            toPascalCase,
           }
         );
         break;
@@ -469,7 +475,7 @@ module.exports = class extends Generator {
         console.log('mutation:', mutation)
         this.fs.copyTpl(
           this.templatePath(`_mutation.ts.ejs`),
-          this.destinationPath(`mutation/${mutation.mutationName.split('_').map((part, index) => index == 0 ? part.toLowerCase() : part.substr(0,1) + part.substr(1).toLowerCase()).join('')}.ts`),
+          this.destinationPath(`mutations/${mutation.mutationName.split('_').map((part, index) => index == 0 ? part.toLowerCase() : part.substr(0,1) + part.substr(1).toLowerCase()).join('')}.ts`),
           {
             ...mutation,
             toPascalCase,
