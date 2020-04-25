@@ -1,5 +1,5 @@
 {
-  "name": "generator-oasis",
+  "name": "generator-wallet",
   "version": "0.0.0",
   "description": "Oasis React Toolkit Generator",
   "homepage": "https://bitbucket.org/oasis-recycle/generator-oasis/",
@@ -31,8 +31,8 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "yeoman-generator": "^2.0.1",
     "chalk": "^2.1.0",
+    "yeoman-generator": "^2.0.1",
     "yosay": "^2.0.1"
   },
   "jest": {

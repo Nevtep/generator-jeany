@@ -1,19 +1,19 @@
-# generator-oasis [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-image]][daviddm-url]
+# generator-wallet [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-image]][daviddm-url]
 > Oasis React Toolkit Generator
 
 ## Installation
 
-First, install [Yeoman](http://yeoman.io) and generator-oasis using [npm](https://www.npmjs.com/) (we assume you have pre-installed [node.js](https://nodejs.org/)).
+First, install [Yeoman](http://yeoman.io) and generator-wallet using [npm](https://www.npmjs.com/) (we assume you have pre-installed [node.js](https://nodejs.org/)).
 
 ```bash
 npm install -g yo
-npm install -g generator-oasis
+npm install -g generator-wallet
 ```
 
 Then generate your new project:
 
 ```bash
-yo oasis
+yo wallet
 ```
 
 ## Getting To Know Yeoman
