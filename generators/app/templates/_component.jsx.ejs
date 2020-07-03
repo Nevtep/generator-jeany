@@ -1,0 +1,33 @@
+
+import React from 'react';
+import PropTypes from 'prop-types';
+<%if(addQuery || addMutation){%>
+import {<%= addQuery ? ' useQuery,' : '' %><%= addMutation ? ' useMutation' : '' %>  } from '@apollo/react-hooks';
+<% if(addQuery) {%>import { <%= queryName %> } from '../queries';<%}%>
+<% if(addMutation) {%>import { <%= mutationName %> } from '../mutations';<%}%>
+<%}if(useStyles){%>import { makeStyles } from '@material-ui/core/styles';
+
+const useStyles = makeStyles(theme => ({
+}));<%}%>
+
+const <%= componentName %> = (<%if(hasProps){%>{<%=props.map(prop=> prop.name).join(', ')%>}<%}%>) => {
+    <%if(useStyles){%>const classes = useStyles();<%}%>
+    <%if(useState){
+        for (stateProp of stateProps) {%>const [<%= stateProp.name %>, <%= toCamelCase(`set_${stateProp.name}`) %>] = useState(<%= stateProp.defaultValue %>);<%}%>
+    <%} if(addQuery){%>const { loading, error, data } = useQuery(<%= queryName %>);<%}%>
+    <%if(addMutation){%>const [mutate<%= mutationName.split('_').map(part => part.substr(0,1) + part.substr(1).toLowerCase()).join('') %>, { loading, error, data }] = useMutation<<%= mutationName.split('_').map(part => part.substr(0,1) + part.substr(1).toLowerCase()).join('') %>>(<%= mutationName %>);<%}%>
+    return (<React.Fragment>
+      
+    </React.Fragment>);
+}
+
+<%= componentName %>.propTypes = {
+  <%for (prop of props) {%><%=prop.name%>: PropTypes.<%=prop.type%>,<%}%>
+};
+
+<%= componentName %>.defaultProps = {
+    <%for (prop of props) {%><%=prop.name%>: <%=prop.defaultValue%>,
+    <%}%>
+};
+
+export default <%= componentName %>;

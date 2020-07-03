@@ -1,0 +1,16 @@
+import React from 'react';
+import { action } from '@storybook/addon-actions';
+import <%=componentName%> from '../components/<%=componentName%>.component'
+import { WithMateriaUITheme } from '../components/testUtils';
+
+export default {
+  title: '<%=componentName%>',
+  component: <%=componentName%>,
+};
+
+export const Display = () => (
+  <WithMateriaUITheme>
+    <<%=componentName%> <%for (prop of props){%>
+      <%=prop.name%>={<%=prop.defaultValue%>} <%}%>
+    />
+  </WithMateriaUITheme>);

@@ -3,7 +3,7 @@ import gql from 'graphql-tag';
 export const <%= mutationName %> = gql`
 mutation <%= toPascalCase(mutationName) %>($<%= inputEntityName.toLowerCase()%>: <%= inputEntityName%>Input!) {
   <%= toCamelCase(mutationName) %>(<%= inputEntityName.toLowerCase()%>: $<%= inputEntityName.toLowerCase()%>) {
-    <%= entityName.toLowerCase()%> {
+    <%= mutationEntity.toLowerCase()%> {
         <% for (property of props) {%><%= property.name %>
         <% } %>
     }

@@ -2,7 +2,7 @@ import gql from 'graphql-tag';
 
 export const <%= queryName %> = gql`
 query <%= queryName.split('_').map(part => part.substr(0,1) + part.substr(1).toLowerCase()).join('') %> {
-    <%= entityName.toLowerCase() %>s() {
+    <%= queryEntity.toLowerCase() %>s() {
         <% for (property of props) {%>
             <%= property.name %>
         <% } %>

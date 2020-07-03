@@ -1,5 +1,5 @@
 {
-  "generator-wallet": {},
+  "generator-jeany": {},
   "generator-node": {
     "promptValues": {
       "authorEmail": "corellanot@gmail.com",

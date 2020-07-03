@@ -1,487 +1,455 @@
-'use strict';
-const Generator = require('yeoman-generator');
-const chalk = require('chalk');
-const yosay = require('yosay');
+/* eslint-disable */
+"use strict";
+const Generator = require("yeoman-generator");
+const chalk = require("chalk");
+const yosay = require("yosay");
 
 module.exports = class extends Generator {
   async prompting() {
     // Have Yeoman greet the user.
     this.log(
-      yosay(`Welcome to the prime ${chalk.cyan('Oasis React Toolkit')} generator!`)
+      yosay(
+        `Welcome to the prime ${chalk.cyan("Carmuv React Toolkit")} generator!`
+      )
     );
 
-    var propsPromps = [
+    const propsPrompt = [
       {
-        type: 'input',
-        name: 'name',
-        message: "Enter the name of the property:",
+        type: "input",
+        name: "name",
+        message: "Enter the name of the property:"
       },
       {
-        type: 'input',
-        name: 'title',
+        type: "input",
+        name: "title",
         message: "Enter the title of the property:",
         default: function(answers) {
-          return answers.name.substr(0,1).toUpperCase() + answers.name.substr(1);
+          return (
+            answers.name.substr(0, 1).toUpperCase() + answers.name.substr(1)
+          );
         }
       },
       {
-        type: 'confirm',
-        name: 'isNumeric',
-        message: 'Is a numeric property?',
-        default: false
+        type: "list",
+        name: "type",
+        choices: [
+          "array",
+          "bool",
+          "func",
+          "number",
+          "object",
+          "string",
+          "symbol",
+          "any",
+          "arrayOf",
+          "element",
+          "elementType",
+          "instanceOf",
+          "node",
+          "objectOf",
+          "oneOf",
+          "oneOfType",
+          "shape",
+          "exact"
+        ],
+        message: "Select type of the property:",
+        default: "string"
       },
       {
-        type: 'confirm',
-        name: 'addAnother',
-        message: 'Add another property?',
+        type: "text",
+        name: "defaultValue",
+        message: "enter default value",
+      },
+      {
+        type: "confirm",
+        name: "addAnother",
+        message: "Add another property?",
         default: true
       }
     ];
-
-    const promptForProps = async (props) => {
-      const {addAnother, ...property} = await this.prompt(propsPromps);
+    const mutationPrompt = [
+      {
+        name: "mutationEntity",
+        message: "Please enter your entity name:"
+      },
+      {
+        name: "inputEntityName",
+        message: "Please enter your input entity name:",
+        default: function(answers) {
+          return answers.mutationEntity;
+        }
+      },
+      {
+        name: "mutationName",
+        message: "Enter the mutation name:",
+        default: function(answers) {
+          return `SET_${answers.mutationEntity.toUpperCase()}`;
+        }
+      }
+    ];
+    const queryPrompt = [
+      {
+        name: "queryEntity",
+        message: "Please enter your entity name:"
+      },
+      {
+        name: "queryName",
+        message: "Enter the query name:",
+        default: function(answers) {
+          return `GET_${answers.queryEntity.toUpperCase()}S`;
+        }
+      }
+    ];
+    const promptForProps = async props => {
+      const { addAnother, ...property } = await this.prompt(propsPrompt);
       props.push(property);
       if (addAnother) {
         return await promptForProps(props);
-      } else {
-        debugger;
-        return props;
       }
-    }
+
+      return props;
+    };
 
     const getProperties = async () => {
-      const props = [];
-      return await promptForProps(props);
-    }
+      const props = await promptForProps([]);
+      return props;
+    };
 
     const createQuery = async () => {
-      return await this.prompt([
-        {
-          name: 'entityName',
-          message: 'Please enter your entity name:'
-        },
-        {
-          name: 'queryName',
-          message: 'Enter the query name:',
-          default: function(answers) {
-            return `GET_${answers.entityName.toUpperCase()}S`;
-          },
-        }
-      ]);
-    }
+      const query = await this.prompt(queryPrompt);
+      return query;
+    };
 
     const createMutation = async () => {
-      return await this.prompt([
-        {
-          name: 'entityName',
-          message: 'Please enter your entity name:'
-        },
-        {
-          name: 'inputEntityName',
-          message: 'Please enter your input entity name:'
-        },
-        {
-          name: 'mutationName',
-          message: 'Enter the mutation name:',
-          default: function(answers) {
-            return `SET_${answers.entityName.toUpperCase()}`;
-          },
-        }
-      ]);
-    }
-
-    const createStack = async () => {
-      const prompts = [
-        {
-          name: 'entityName',
-          message: 'Please enter your entity name:'
-        },
-        {
-          type: 'confirm',
-          name: 'addList',
-          message: 'Do you want to add a list?',
-          default: true,
-        },
-        {
-          name: 'queryName',
-          message: 'Enter the query name:',
-          when: function(answers) {
-            return answers.addList;
-          },
-          default: function(answers) {
-            return `GET_${answers.entityName.toUpperCase()}S`;
-          },
-        },
-        {
-          type: 'confirm',
-          name: 'addForm',
-          message: 'Do you want to add a form?',
-          default: true,
-        },
-        {
-          name: 'mutationName',
-          message: 'Enter the mutation name:',
-          when: function(answers) {
-            return answers.addForm;
-          },
-          default: function(answers) {
-            return `CREATE_OR_UPDATE_${answers.entityName.toUpperCase()}`;
-          },
-        },
-        {
-          name: 'inputEntityName',
-          message: 'Please enter your input entity name:',
-          when: function(answers) {
-            return answers.addForm;
-          },
-          default: function(answers) {
-            return answers.entityName;
-          },
-        },
-      ];
-
-      return await this.prompt(prompts);
-    }
+      const mutation = await this.prompt(mutationPrompt);
+      return mutation;
+    };
 
     const createComponent = async () => {
       const prompts = [
         {
-          name: 'type',
-          type: 'list',
-          message: 'What kind of component do you want to generate?',
-          choices: ['List', 'Form', 'Blank'],
-          default: 'List',
-          cache: true,
+          name: "type",
+          type: "list",
+          message: "What do you want to generate?",
+          choices: ["Component"],
+          default: "Component",
+          cache: true
         },
         {
-          name: 'entityName',
-          message: 'Enter a name for your entity:',
-          when: function(answers) {
-            return answers.type != 'Blank'
-          },
-          default: 'Entity',
-          cache: true,
+          name: "name",
+          message: "Enter a name for your component:",
+          cache: true
         },
         {
-          type: 'confirm',
-          name: 'addQuery',
-          message: 'Does your component use a Query?',
+          type: "confirm",
+          name: "useStyles",
+          message: "Does you want to use styles?",
           default: function(answers) {
-            return answers.type != 'Blank'
+            return answers.type === "Component";
           },
-          cache: true,
+          cache: true
         },
         {
-          name: 'queryName',
-          message: 'Enter the query name:',
+          type: "confirm",
+          name: "addQuery",
+          message: "Does your component use a Query?",
+          default: function(answers) {
+            return answers.type === "Container";
+          },
+          cache: true
+        },
+        ...queryPrompt.map(query => ({
+          ...query,
           when: function(answers) {
             return answers.addQuery;
-          },
-          default: 'GET_ENTITY',
-          cache: true,
-        },
+          }
+        })),
         {
-          type: 'confirm',
-          name: 'addMutation',
-          message: 'Does your component use a Mutation?',
+          type: "confirm",
+          name: "addMutation",
+          message: "Does your component use a Mutation?",
           default: function(answers) {
-            return answers.type == 'Form'
+            return answers.type === "Container";
           },
-          cache: true,
+          cache: true
         },
-        {
-          name: 'mutationName',
-          message: 'Enter the mutation name:',
+        ...mutationPrompt.map(mutation => ({
+          ...mutation,
           when: function(answers) {
             return answers.addMutation;
-          },
-          default: 'CREATE_OR_UPDATE_ENTITY',
-          cache: true,
-        },
+          }
+        })),
         {
-          name: 'inputEntityName',
-          message: 'Please enter your input entity name:',
-          when: function(answers) {
-            return answers.addMutation;
-          },
+          type: "confirm",
+          name: "useState",
+          message: "Does your component use State?",
           default: function(answers) {
-            return answers.entityName;
+            return answers.type === "Container";
           },
-        },
-        {
-          name: 'name',
-          message: 'Enter a name for your component:',
-          when: function(answers) {
-            return answers.type == 'Blank'
-          },
-          default: 'EntityComponent',
-          cache: true,
-        },
-        {
-          type: 'confirm',
-          name: 'addPage',
-          message: 'Would you like to generate a page route for it?',
-          default: true,
-          cache: true,
-        },
-        {
-          type: 'confirm',
-          name: 'addScreen',
-          message: 'Would you like to generate a screen component for it?',
-          default: true,
-          cache: true,
+          cache: true
         }
       ];
 
-      return await this.prompt(prompts);
-    }
+      const answers = await this.prompt(prompts);
+      if (answers.useState) {
+        const stateProps = await getProperties();
+        answers.stateProps = stateProps;
+      }
 
-    this.generator = await this.prompt([{
-      name: 'type',
-      type: 'list',
-      message: 'What would you like to scaffold?',
-      choices: ['Stack','Component', 'Query', 'Mutation'],
-      default: 'Stack',
-    }]);
+      const { hasProps } = await this.prompt({
+        type: "confirm",
+        name: "hasProps",
+        message: "Does your component has props?",
+        default: true,
+        cache: true
+      });
 
-    switch(this.generator.type) {
-      case 'Stack':
-        this.generator.stack = await createStack();
-        this.generator.stack.props = await getProperties();
-        break;
-      case 'Component':
-        this.generator.component = await createComponent();
-        if(this.generator.component.type !== 'Blank') {
-          this.generator.component.props = await getProperties();
-        } else {
-          const files = await this.prompt([
-            {
-              name: 'createQuery',
-              type: 'confirm',
-              message: 'Do you want to create a query file?',
-              when: (answers) => {
-                return this.generator.component.addQuery;
-              },
-              default: true
-            },{
-              name: 'createMutation',
-              type: 'confirm',
-              message: 'Do you want to create a mutation file?',
-              when: (answers) => {
-                return this.generator.component.addMutation;
-              },
-              default: true
-            },
-          ]);
-          if(files.createQuery || files.createMutation) {
-            const answer = await this.prompt([
-              {
-                name: 'entityName',
-                message: 'Enter the Entity name:'
-              }
-            ]);
-            this.generator.component.entityName = answer.entityName;
-          }
-          if(files.createQuery) {
-            this.generator.component.queryProps = await getProperties();
-          }
-          if(files.createMutation) {
-            this.generator.component.mutationProps = await getProperties();
-          }
-          this.generator.component.createQuery = files.createQuery;
-          this.generator.component.createMutation = files.createMutation;
-        }
-        break;
-      case 'Query':
+      answers.hasProps = hasProps;
+
+      if (hasProps) {
+        answers.props = await getProperties();
+      }
+
+      return answers;
+    };
+
+    this.generator = await this.prompt([
+      {
+        name: "type",
+        type: "list",
+        message: "What would you like to scaffold?",
+        choices: ["React Component", "Query", "Mutation"],
+        default: "React Component"
+      }
+    ]);
+
+    switch (this.generator.type) {
+      case "Query":
         this.generator.query = await createQuery();
         this.generator.query.props = await getProperties();
         break;
-      case 'Mutation':
+      case "Mutation":
         this.generator.mutation = await createMutation();
         this.generator.mutation.props = await getProperties();
         break;
+      case "React Component":
+      default:
+        this.generator.component = await createComponent();
+        const files = await this.prompt([
+          {
+            name: "createStories",
+            type: "confirm",
+            message: "Do you want to create a story file?",
+            default: true
+          },
+          {
+            name: "createTests",
+            type: "confirm",
+            message: "Do you want to create a test file?",
+            default: true
+          },
+          {
+            name: "createQuery",
+            type: "confirm",
+            message: "Do you want to create a query file?",
+            when: () => {
+              return this.generator.component.addQuery;
+            },
+            default: true
+          },
+          {
+            name: "createMutation",
+            type: "confirm",
+            message: "Do you want to create a mutation file?",
+            when: () => {
+              return this.generator.component.addMutation;
+            },
+            default: true
+          }
+        ]);
+
+        if (files.createQuery) {
+          this.generator.component.queryProps = await getProperties();
+        }
+
+        if (files.createMutation) {
+          this.generator.component.mutationProps = await getProperties();
+        }
+
+        this.generator.component.createQuery = files.createQuery;
+        this.generator.component.createMutation = files.createMutation;
+        this.generator.component.createStories = files.createStories;
+        this.generator.component.createTests = files.createTests;
+
+        break;
     }
 
+    console.log(this.generator);
   }
 
   writing() {
-    debugger;
-    const toCamelCase = (value) => {
-      return value.split('_').map((part, index) => index == 0 ? part.toLowerCase() : part.substr(0,1) + part.substr(1).toLowerCase()).join('');
-    }
+    const toCamelCase = value => {
+      return value
+        .split("_")
+        .map((part, index) =>
+          index === 0
+            ? part.toLowerCase()
+            : part.substr(0, 1) + part.substr(1).toLowerCase()
+        )
+        .join("");
+    };
 
-    const toPascalCase = (value) => {
-      return value.split('_').map(part => part.substr(0,1) + part.substr(1).toLowerCase()).join('');
-    }
+    const toPascalCase = value => {
+      return value
+        .split("_")
+        .map(part => part.substr(0, 1) + part.substr(1).toLowerCase())
+        .join("");
+    };
 
-    this.destinationRoot('./src');
-    
-    switch(this.generator.type) {
-      case 'Stack':
-        const { stack } = this.generator;
-        const { entityName } = stack;
-        const stackContext = {
-          ...stack,
-          toCamelCase,
-          toPascalCase,
-        }
-        this.fs.copyTpl(
-          this.templatePath(`_stack.tsx.ejs`),
-          this.destinationPath(`screens/${entityName.toLowerCase()}s/Stack.tsx`),
-          stackContext
-        );
-        if(stack.addList) {
-          const navContext = {
-            ...stackContext,
-            type: 'List',
-            componentName: `${stackContext.entityName}List`,
-          }
-          this.fs.copyTpl(
-            this.templatePath(`_componentList.tsx.ejs`),
-            this.destinationPath(`components/${entityName}List.tsx`),
-            stackContext
-          );
-          this.fs.copyTpl(
-            this.templatePath(`_entityRow.tsx.ejs`),
-            this.destinationPath(`components/${entityName}Row.tsx`),
-            stackContext
-          );
+    this.destinationRoot("./src");
 
-          this.fs.copyTpl(
-            this.templatePath('_page.tsx.ejs'),
-            this.destinationPath(`pages/${entityName.toLowerCase()}s/list.tsx`),
-            navContext
-          );
-    
-          this.fs.copyTpl(
-            this.templatePath('_screen.tsx.ejs'),
-            this.destinationPath(`screens/${entityName.toLowerCase()}s/ListScreen.tsx`),
-            navContext
-          );
-
-          this.fs.copyTpl(
-            this.templatePath(`_query.ts.ejs`),
-            this.destinationPath(`queries/${stackContext.queryName.split('_').map((part, index) => index == 0 ? part.toLowerCase() : part.substr(0,1) + part.substr(1).toLowerCase()).join('')}.ts`),
-            stackContext
-          );
-          
-        }
-        if(stack.addForm) {
-          const navContext = {
-            ...stackContext,
-            type: 'Form',
-            componentName: `${stackContext.entityName}Form`,
-          }
-          this.fs.copyTpl(
-            this.templatePath(`_componentForm.tsx.ejs`),
-            this.destinationPath(`components/${entityName}Form.tsx`),
-            stackContext
-          );
-          this.fs.copyTpl(
-            this.templatePath('_page.tsx.ejs'),
-            this.destinationPath(`pages/${entityName.toLowerCase()}s/form.tsx`),
-            navContext
-          );
-    
-          this.fs.copyTpl(
-            this.templatePath('_screen.tsx.ejs'),
-            this.destinationPath(`screens/${entityName.toLowerCase()}s/FormScreen.tsx`),
-            navContext
-          );
-
-          this.fs.copyTpl(
-            this.templatePath(`_query.ts.ejs`),
-            this.destinationPath(`queries/${stackContext.queryName.split('_').map((part, index) => index == 0 ? part.toLowerCase() : part.substr(0,1) + part.substr(1).toLowerCase()).join('')}.ts`),
-            stackContext
-          );
-          this.fs.copyTpl(
-            this.templatePath(`_mutation.ts.ejs`),
-            this.destinationPath(`mutations/${stackContext.mutationName.split('_').map((part, index) => index == 0 ? part.toLowerCase() : part.substr(0,1) + part.substr(1).toLowerCase()).join('')}.ts`),
-            stackContext
-          );
-          
-        }
-        break;
-      case 'Component':
-        const { component } = this.generator;
-        const componentContext = {
-          ...component,
-          componentName: component.type == 'Blank' ? component.name : component.entityName + component.type,
-          toCamelCase,
-          toPascalCase,
-        }
-        this.fs.copyTpl(
-          this.templatePath(`_component${component.type}.tsx.ejs`),
-          this.destinationPath(`components/${component.type == 'Blank' ? component.name : component.entityName + component.type}.tsx`),
-          componentContext
-        );
-        if(component.type == 'List') {
-          this.fs.copyTpl(
-            this.templatePath(`_entityRow.tsx.ejs`),
-            this.destinationPath(`components/${component.entityName}Row.tsx`),
-            componentContext
-          );
-        }
-        if(component.createQuery) {
-          this.fs.copyTpl(
-            this.templatePath(`_query.ts.ejs`),
-            this.destinationPath(`queries/${component.queryName.split('_').map((part, index) => index == 0 ? part.toLowerCase() : part.substr(0,1) + part.substr(1).toLowerCase()).join('')}.ts`),
-            {
-              ...componentContext,
-              props: component.queryProps,
-            }
-          );
-        }
-        if(component.createMutation) {
-          this.fs.copyTpl(
-            this.templatePath(`_mutation.ts.ejs`),
-            this.destinationPath(`mutations/${component.mutationName.split('_').map((part, index) => index == 0 ? part.toLowerCase() : part.substr(0,1) + part.substr(1).toLowerCase()).join('')}.ts`),
-            {
-              ...componentContext,
-              props: component.mutationProps,
-            }
-          );
-        }
-        if(component.addPage) {
-          this.fs.copyTpl(
-            this.templatePath('_page.tsx.ejs'),
-            this.destinationPath(`pages/${component.type == 'Blank' ? component.name.toLowerCase() : component.entityName.toLowerCase() + '/' + component.type.toLowerCase()}.tsx`),
-            componentContext
-          );
-        }
-    
-        if(component.addScreen) {
-          this.fs.copyTpl(
-            this.templatePath('_screen.tsx.ejs'),
-            this.destinationPath(`screens/${component.type == 'Blank' ? component.name : component.entityName + '/' + component.type}Screen.tsx`),
-            componentContext
-          );
-        }
-        break;
-      case 'Query':
+    switch (this.generator.type) {
+      case "Query":
         const { query } = this.generator;
         this.fs.copyTpl(
-          this.templatePath(`_query.ts.ejs`),
-          this.destinationPath(`queries/${query.queryName.split('_').map((part, index) => index == 0 ? part.toLowerCase() : part.substr(0,1) + part.substr(1).toLowerCase()).join('')}.ts`),
+          this.templatePath(`_query.js.ejs`),
+          this.destinationPath(
+            `queries/${query.queryName
+              .split("_")
+              .map((part, index) =>
+                index == 0
+                  ? part.toLowerCase()
+                  : part.substr(0, 1) + part.substr(1).toLowerCase()
+              )
+              .join("")}.js`
+          ),
           {
             ...query,
             toCamelCase,
-            toPascalCase,
+            toPascalCase
           }
         );
         break;
-      case 'Mutation':
+      case "Mutation":
         const { mutation } = this.generator;
-        console.log('mutation:', mutation)
+        console.log("mutation:", mutation);
         this.fs.copyTpl(
-          this.templatePath(`_mutation.ts.ejs`),
-          this.destinationPath(`mutations/${mutation.mutationName.split('_').map((part, index) => index == 0 ? part.toLowerCase() : part.substr(0,1) + part.substr(1).toLowerCase()).join('')}.ts`),
+          this.templatePath(`_mutation.js.ejs`),
+          this.destinationPath(
+            `mutations/${mutation.mutationName
+              .split("_")
+              .map((part, index) =>
+                index == 0
+                  ? part.toLowerCase()
+                  : part.substr(0, 1) + part.substr(1).toLowerCase()
+              )
+              .join("")}.js`
+          ),
           {
             ...mutation,
             toPascalCase,
             toCamelCase
           }
         );
+        break;
+      case "Component":
+      default:
+        const { component } = this.generator;
+        const componentContext = {
+          ...component,
+          componentName: component.name,
+          toCamelCase,
+          toPascalCase,
+        }
+        this.fs.copyTpl(
+          this.templatePath(`_component.jsx.ejs`),
+          this.destinationPath(
+            `components/${component.name}.jsx`
+          ),
+          componentContext
+        );
+
+        if (component.createQuery) {
+          this.fs.copyTpl(
+            this.templatePath(`_query.js.ejs`),
+            this.destinationPath(
+              `queries/${component.queryName
+                .split("_")
+                .map((part, index) =>
+                  index == 0
+                    ? part.toLowerCase()
+                    : part.substr(0, 1) + part.substr(1).toLowerCase()
+                )
+                .join("")}.js`
+            ),
+            {
+              ...componentContext,
+              props: component.queryProps
+            }
+          );
+        }
+
+        if (component.createMutation) {
+          this.fs.copyTpl(
+            this.templatePath(`_mutation.js.ejs`),
+            this.destinationPath(
+              `mutations/${component.mutationName
+                .split("_")
+                .map((part, index) =>
+                  index == 0
+                    ? part.toLowerCase()
+                    : part.substr(0, 1) + part.substr(1).toLowerCase()
+                )
+                .join("")}.js`
+            ),
+            {
+              ...componentContext,
+              props: component.mutationProps
+            }
+          );
+        }
+
+        if (component.createTests) {
+          this.fs.copyTpl(
+            this.templatePath(`_component.test.jsx.ejs`),
+            this.destinationPath(
+              `components/${component.name}.test.jsx`
+            ),
+            {
+              ...componentContext,
+              props: component.props
+            }
+          );
+        }
+
+        if (component.createStories) {
+          this.fs.copyTpl(
+            this.templatePath(`_component.stories.js.ejs`),
+            this.destinationPath(
+              `stories/${component.name}.stories.js`
+            ),
+            {
+              ...componentContext,
+              props: component.props
+            }
+          );
+        }
+
+        if (component.addPage) {
+          this.fs.copyTpl(
+            this.templatePath("_page.jsx.ejs"),
+            this.destinationPath(
+              `pages/${
+                component.type == "Blank"
+                  ? component.name.toLowerCase()
+                  : component.entityName.toLowerCase() +
+                    "/" +
+                    component.type.toLowerCase()
+              }.jsx`
+            ),
+            componentContext
+          );
+        }
         break;
     }
   }

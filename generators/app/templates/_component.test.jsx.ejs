@@ -1,0 +1,25 @@
+import React from 'react';
+import { createMount } from '@material-ui/core/test-utils';
+import { WithMateriaUITheme } from '../testUtils';
+import <%=componentName%>Component from "./<%=componentName%>.component";
+
+describe('<<%=componentName%>Component />', () => {
+  let mount;
+
+  beforeAll(() => {
+    mount = createMount();
+  });
+
+  afterAll(() => {
+    mount.cleanUp();
+  });
+
+  it('should match snapshot', () => {
+    const wrapper = mount(<WithMateriaUITheme>
+      <<%=componentName%>Component <%for (prop of props){%>
+        <%=prop.name%>={<%=prop.defaultValue%>}<%}%>
+      />
+    </WithMateriaUITheme>);
+    expect(wrapper.html()).toMatchSnapshot();
+  });
+});

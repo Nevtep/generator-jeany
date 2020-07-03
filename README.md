@@ -1,19 +1,19 @@
-# generator-wallet [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-image]][daviddm-url]
+# generator-jeany [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-image]][daviddm-url]
 > Oasis React Toolkit Generator
 
 ## Installation
 
-First, install [Yeoman](http://yeoman.io) and generator-wallet using [npm](https://www.npmjs.com/) (we assume you have pre-installed [node.js](https://nodejs.org/)).
+First, install [Yeoman](http://yeoman.io) and generator-jeany using [npm](https://www.npmjs.com/) (we assume you have pre-installed [node.js](https://nodejs.org/)).
 
 ```bash
 npm install -g yo
-npm install -g generator-wallet
+npm install -g generator-jeany
 ```
 
 Then generate your new project:
 
 ```bash
-yo wallet
+yo jeany
 ```
 
 ## Getting To Know Yeoman
@@ -28,9 +28,9 @@ yo wallet
 MIT © [Tomás Corellano]()
 
 
-[npm-image]: https://badge.fury.io/js/generator-oasis.svg
-[npm-url]: https://npmjs.org/package/generator-oasis
-[travis-image]: https://travis-ci.com/Nevtep/generator-oasis.svg?branch=master
-[travis-url]: https://travis-ci.com/Nevtep/generator-oasis
-[daviddm-image]: https://david-dm.org/Nevtep/generator-oasis.svg?theme=shields.io
-[daviddm-url]: https://david-dm.org/Nevtep/generator-oasis
+[npm-image]: https://badge.fury.io/js/generator-jeany.svg
+[npm-url]: https://npmjs.org/package/generator-jeany
+[travis-image]: https://travis-ci.com/Nevtep/generator-jeany.svg?branch=master
+[travis-url]: https://travis-ci.com/Nevtep/generator-jeany
+[daviddm-image]: https://david-dm.org/Nevtep/generator-jeany.svg?theme=shields.io
+[daviddm-url]: https://david-dm.org/Nevtep/generator-jeany

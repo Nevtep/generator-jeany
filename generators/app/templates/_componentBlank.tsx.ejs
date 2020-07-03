@@ -1,5 +1,4 @@
 import React from 'react';
-import { StyleSheet } from 'react-native';
 <%if(addQuery || addMutation){%>
 import {<%= addQuery ? ' useQuery,' : '' %><%= addMutation ? ' useMutation' : '' %>  } from '@apollo/react-hooks';
 <% if(addQuery) {%>import { <%= queryName %> } from '../queries';
@@ -17,8 +16,5 @@ const <%= componentName %>: React.FC<<%= componentName %>Props> = () => {
       
     </React.Fragment>);
 }
-
-const styles = StyleSheet.create({
-})
 
 export default <%= componentName %>;
